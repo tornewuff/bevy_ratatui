@@ -3,9 +3,7 @@ use bevy::{
     prelude::{Commands, Result},
 };
 
-use crate::{RatatuiContext, context::DefaultContext};
-
-use crate::context::TerminalContext;
+use crate::{CrosstermPlugin, RatatuiContext};
 
 /// A plugin group that includes all the plugins in the Ratatui crate.
 ///
@@ -42,7 +40,14 @@ impl PluginGroup for RatatuiPlugins {
 
         builder = builder.add(ContextPlugin);
 
-        builder = DefaultContext::configure_plugin_group(&self, builder);
+        #[cfg(all(feature = "crossterm", not(feature = "windowed")))]
+        {
+            builder = builder.add(CrosstermPlugin {
+                enable_kitty_protocol: self.enable_kitty_protocol,
+                enable_mouse_capture: self.enable_mouse_capture,
+                enable_input_forwarding: self.enable_input_forwarding,
+            });
+        }
 
         builder
     }

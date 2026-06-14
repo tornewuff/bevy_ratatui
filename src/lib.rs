@@ -67,6 +67,9 @@ pub use ratatui_context::RatatuiContext;
 pub use ratatui_plugin::RatatuiPlugins;
 
 #[cfg(feature = "crossterm")]
+pub use crossterm_context::CrosstermPlugin;
+
+#[cfg(feature = "crossterm")]
 pub use ratatui::crossterm;
 
 pub mod context {

@@ -11,14 +11,7 @@ use ratatui::crossterm::{
 
 use ratatui::backend::CrosstermBackend;
 
-use crate::{RatatuiPlugins, context::TerminalContext};
-
-use super::{cleanup::CleanupPlugin, error::ErrorPlugin, event::EventPlugin, kitty::KittyPlugin};
-
-#[cfg(feature = "mouse")]
-use super::mouse::MousePlugin;
-#[cfg(feature = "keyboard")]
-use super::translation::TranslationPlugin;
+use crate::context::TerminalContext;
 
 static TERMINAL_INITIALIZED: AtomicBool = AtomicBool::new(false);
 
@@ -38,39 +31,6 @@ impl TerminalContext<CrosstermBackend<Stdout>> for CrosstermContext {
         let backend = CrosstermBackend::new(stdout);
         let terminal = Terminal::new(backend)?;
         Ok(Self(terminal))
-    }
-
-    fn configure_plugin_group(
-        group: &RatatuiPlugins,
-        mut builder: bevy::app::PluginGroupBuilder,
-    ) -> bevy::app::PluginGroupBuilder {
-        builder = builder
-            .add(CleanupPlugin)
-            .add(ErrorPlugin)
-            .add(EventPlugin::default())
-            .add(KittyPlugin);
-
-        #[cfg(feature = "mouse")]
-        let builder = builder.add(MousePlugin);
-        #[cfg(feature = "keyboard")]
-        let builder = builder.add(TranslationPlugin);
-
-        let mut builder = builder;
-        if !group.enable_kitty_protocol {
-            builder = builder.disable::<KittyPlugin>();
-        }
-
-        #[cfg(feature = "mouse")]
-        if !group.enable_mouse_capture {
-            builder = builder.disable::<MousePlugin>();
-        }
-
-        #[cfg(feature = "keyboard")]
-        if !group.enable_input_forwarding {
-            builder = builder.disable::<TranslationPlugin>();
-        }
-
-        builder
     }
 }
 
