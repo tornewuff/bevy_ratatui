@@ -1,12 +1,11 @@
 use bevy::prelude::*;
 
-pub mod cleanup;
+use crate::RatatuiContext;
+use crate::context::CrosstermContext;
+use crate::crossterm_context::context::CrosstermOptions;
+
 pub mod context;
-pub mod error;
 pub mod event;
-pub mod kitty;
-#[cfg(feature = "mouse")]
-pub mod mouse;
 
 #[cfg(feature = "keyboard")]
 pub mod translation;
@@ -32,24 +31,26 @@ impl Default for CrosstermPlugin {
 
 impl Plugin for CrosstermPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((
-            cleanup::CleanupPlugin,
-            error::ErrorPlugin,
-            event::EventPlugin::default(),
-        ));
-
-        if self.enable_kitty_protocol {
-            app.add_plugins(kitty::KittyPlugin);
-        }
-
-        #[cfg(feature = "mouse")]
-        if self.enable_mouse_capture {
-            app.add_plugins(mouse::MousePlugin);
-        }
+        app.add_plugins(event::EventPlugin::default());
 
         #[cfg(feature = "keyboard")]
         if self.enable_input_forwarding {
             app.add_plugins(translation::TranslationPlugin);
         }
+
+        let &Self {
+            enable_kitty_protocol,
+            enable_mouse_capture,
+            ..
+        } = self;
+
+        app.add_systems(Startup, move |mut commands: Commands| -> Result {
+            let context = CrosstermContext::new(CrosstermOptions {
+                enable_kitty_protocol,
+                enable_mouse_capture,
+            })?;
+            commands.insert_resource(RatatuiContext(context));
+            Ok(())
+        });
     }
 }

@@ -1,7 +1,5 @@
 use bevy::prelude::*;
 
-use super::context_trait::TerminalContext;
-
 #[cfg(all(feature = "crossterm", not(feature = "windowed")))]
 pub type DefaultContext = crate::context::CrosstermContext;
 
@@ -27,9 +25,3 @@ pub type DefaultContext = crate::context::WindowedContext;
 /// ```
 #[derive(Resource, Deref, DerefMut, Debug)]
 pub struct RatatuiContext(pub DefaultContext);
-
-impl RatatuiContext {
-    pub fn init() -> Result<Self> {
-        Ok(Self(DefaultContext::init()?))
-    }
-}

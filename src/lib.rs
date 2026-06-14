@@ -55,7 +55,6 @@
 //! [Ratatui]: https://ratatui.rs
 //! [examples]: https://github.com/ratatui/bevy_ratatui/tree/main/examples
 
-mod context_trait;
 #[cfg(feature = "crossterm")]
 mod crossterm_context;
 mod ratatui_context;
@@ -73,23 +72,11 @@ pub use crossterm_context::CrosstermPlugin;
 pub use ratatui::crossterm;
 
 pub mod context {
-    pub use super::context_trait::TerminalContext;
     #[cfg(feature = "crossterm")]
     pub use super::crossterm_context::context::CrosstermContext;
     pub use super::ratatui_context::DefaultContext;
-    pub use super::ratatui_plugin::ContextPlugin;
     #[cfg(feature = "windowed")]
     pub use super::windowed_context::context::WindowedContext;
-}
-
-#[cfg(feature = "crossterm")]
-pub mod cleanup {
-    pub use super::crossterm_context::cleanup::CleanupPlugin;
-}
-
-#[cfg(feature = "crossterm")]
-pub mod error {
-    pub use super::crossterm_context::error::ErrorPlugin;
 }
 
 #[cfg(feature = "crossterm")]
@@ -98,16 +85,6 @@ pub mod event {
         CrosstermMessage, EventPlugin, FocusMessage, InputSet, KeyMessage, MouseMessage,
         PasteMessage, ResizeMessage,
     };
-}
-
-#[cfg(feature = "crossterm")]
-pub mod kitty {
-    pub use super::crossterm_context::kitty::{KittyEnabled, KittyPlugin};
-}
-
-#[cfg(all(feature = "crossterm", feature = "mouse"))]
-pub mod mouse {
-    pub use super::crossterm_context::mouse::{MouseEnabled, MousePlugin};
 }
 
 #[cfg(feature = "crossterm")]

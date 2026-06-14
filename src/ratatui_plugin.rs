@@ -1,9 +1,6 @@
-use bevy::{
-    app::{Plugin, PluginGroup, PluginGroupBuilder, Startup},
-    prelude::{Commands, Result},
-};
+use bevy::app::{PluginGroup, PluginGroupBuilder};
 
-use crate::{CrosstermPlugin, RatatuiContext};
+use crate::CrosstermPlugin;
 
 /// A plugin group that includes all the plugins in the Ratatui crate.
 ///
@@ -38,8 +35,6 @@ impl PluginGroup for RatatuiPlugins {
     fn build(self) -> PluginGroupBuilder {
         let mut builder = PluginGroupBuilder::start::<Self>();
 
-        builder = builder.add(ContextPlugin);
-
         #[cfg(all(feature = "crossterm", not(feature = "windowed")))]
         {
             builder = builder.add(CrosstermPlugin {
@@ -51,21 +46,4 @@ impl PluginGroup for RatatuiPlugins {
 
         builder
     }
-}
-
-/// The plugin responsible for adding the `RatatuiContext` resource to your bevy application.
-pub struct ContextPlugin;
-
-impl Plugin for ContextPlugin {
-    fn build(&self, app: &mut bevy::prelude::App) {
-        app.add_systems(Startup, context_setup);
-    }
-}
-
-/// A startup system that sets up the terminal context.
-pub fn context_setup(mut commands: Commands) -> Result {
-    let terminal = RatatuiContext::init()?;
-    commands.insert_resource(terminal);
-
-    Ok(())
 }
