@@ -16,9 +16,6 @@ pub trait TerminalContext<T: Backend + 'static>:
     /// Initialize the terminal context.
     fn init() -> Result<Self>;
 
-    /// Restore the terminal to its normal state after exiting.
-    fn restore() -> Result<()>;
-
     /// Configure the plugin group to add the plugins necessary for this particular backend's
     /// functionality.
     fn configure_plugin_group(

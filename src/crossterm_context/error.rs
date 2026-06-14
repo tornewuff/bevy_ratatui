@@ -7,7 +7,7 @@ use std::panic;
 
 use bevy::prelude::*;
 
-use crate::RatatuiContext;
+use crate::context::CrosstermContext;
 
 /// A plugin that sets up panic handling.
 ///
@@ -29,7 +29,7 @@ impl Plugin for ErrorPlugin {
 pub fn error_setup() -> Result {
     let panic_hook = panic::take_hook();
     panic::set_hook(Box::new(move |panic_info| {
-        let _ = RatatuiContext::restore();
+        let _ = CrosstermContext::restore();
         panic_hook(panic_info);
     }));
 

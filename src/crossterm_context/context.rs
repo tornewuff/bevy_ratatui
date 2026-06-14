@@ -40,17 +40,6 @@ impl TerminalContext<CrosstermBackend<Stdout>> for CrosstermContext {
         Ok(Self(terminal))
     }
 
-    fn restore() -> Result<()> {
-        if TERMINAL_INITIALIZED.swap(false, Ordering::Relaxed) {
-            let mut stdout = stdout();
-            stdout
-                .execute(LeaveAlternateScreen)?
-                .execute(cursor::Show)?;
-            disable_raw_mode()?;
-        }
-        Ok(())
-    }
-
     fn configure_plugin_group(
         group: &RatatuiPlugins,
         mut builder: bevy::app::PluginGroupBuilder,
@@ -82,5 +71,26 @@ impl TerminalContext<CrosstermBackend<Stdout>> for CrosstermContext {
         }
 
         builder
+    }
+}
+
+impl CrosstermContext {
+    pub(super) fn restore() -> Result<()> {
+        if TERMINAL_INITIALIZED.swap(false, Ordering::Relaxed) {
+            let mut stdout = stdout();
+            stdout
+                .execute(LeaveAlternateScreen)?
+                .execute(cursor::Show)?;
+            disable_raw_mode()?;
+        }
+        Ok(())
+    }
+}
+
+impl Drop for CrosstermContext {
+    fn drop(&mut self) {
+        if let Err(err) = Self::restore() {
+            eprintln!("Failed to restore terminal: {}", err);
+        }
     }
 }
