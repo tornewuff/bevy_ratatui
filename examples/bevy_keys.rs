@@ -14,7 +14,9 @@ use bevy_ratatui::{
 use ratatui::crossterm::event::KeyEventKind;
 use ratatui::text::Text;
 
-fn main() {
+fn main() -> Result<()> {
+    color_eyre::install()?;
+
     let wait_duration = std::time::Duration::from_secs_f64(1. / 60.); // 60 FPS
     App::new()
         .add_plugins(RatatuiPlugins {
@@ -33,6 +35,8 @@ fn main() {
         .add_systems(Update, draw_scene_system)
         .add_systems(Update, hotkeys)
         .run();
+
+    Ok(())
 }
 
 #[derive(Resource, Deref, DerefMut)]
@@ -148,7 +152,7 @@ fn hotkeys(
 
 fn keyboard_input_system(mut messages: MessageReader<KeyMessage>, mut commands: Commands) {
     for message in messages.read() {
-        commands.insert_resource(LastKeypress(message.clone()));
+        commands.insert_resource(LastKeypress(*message));
     }
 }
 
